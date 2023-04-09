@@ -10,6 +10,10 @@ from kivy.properties import StringProperty, NumericProperty
 import urllib
 import json
 
+import dns.resolver
+dns.resolver.default_resolver=dns.resolver.Resolver(configure=False)
+dns.resolver.default_resolver.nameservers=['8.8.8.8']
+
 myclient = pymongo.MongoClient("mongodb+srv://atta:190501@cluster0.zdkcp1y.mongodb.net/test")
 mydb = myclient["vafa"]
 myuser = mydb["user"]
