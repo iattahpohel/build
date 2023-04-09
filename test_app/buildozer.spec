@@ -12,7 +12,7 @@ requirements = python3,kivy,pymongo,kivymd,requests,pillow
 
 orientation = portrait
 fullscreen = 0
-android.arch = armeabi-v7a
+android.archs = arm64-v8a
 
 # iOS specific
 ios.kivy_ios_url = https://github.com/kivy/kivy-ios
