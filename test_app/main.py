@@ -1,4 +1,3 @@
-import requests
 import re
 import pymongo
 from time import localtime, strftime
@@ -9,6 +8,7 @@ from kivymd.uix.label import MDLabel
 from kivy.uix.screenmanager import ScreenManager
 from kivy.properties import StringProperty, NumericProperty
 import urllib
+import json
 
 myclient = pymongo.MongoClient("mongodb+srv://atta:190501@cluster0.zdkcp1y.mongodb.net/test")
 mydb = myclient["vafa"]
@@ -202,7 +202,13 @@ class MainApp(MDApp):
                 ],
             }
             MainApp.us_ques("main", question)
-            response = requests.post("https://api.pawan.krd/v1/chat/completions", headers=headers, json=json_data).json()            
+            
+            #get response from AI
+            conditionsSetURL = 'https://api.pawan.krd/v1/chat/completions'
+            params = json.dumps(json_data).encode('utf8')
+            req = urllib.request.Request(conditionsSetURL, data=params,headers=headers)
+            response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
+                       
             try:
                 data = response["choices"][0]["message"]
                 if data["content"] == "":
