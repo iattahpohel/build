@@ -12,7 +12,7 @@ import json
 
 import certifi
 import os
-#import ssl
+import ssl
 
 class Response(MDLabel):
     text = StringProperty()
@@ -34,7 +34,7 @@ class Time(MDLabel):
         
 class MainApp(MDApp) :
     current_id = ""
-    #ssl._create_default_https_context = ssl._create_unverified_context
+    ssl._create_default_https_context = ssl._create_unverified_context
     os.environ['SSL_CERT_FILE'] = certifi.where()
     
     def build(self):
