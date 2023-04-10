@@ -10,8 +10,8 @@ import urllib
 import urllib.request
 import json
 
-import certifi
-import os
+#import certifi
+#import os
 import ssl
 
 class Response(MDLabel):
@@ -35,7 +35,7 @@ class Time(MDLabel):
 class MainApp(MDApp) :
     current_id = ""
     ssl._create_default_https_context = ssl._create_unverified_context
-    os.environ['SSL_CERT_FILE'] = certifi.where()
+    #os.environ['SSL_CERT_FILE'] = certifi.where()
     
     def build(self):
         global screen_manager
@@ -97,7 +97,7 @@ class MainApp(MDApp) :
             params = json.dumps(json_data).encode('utf8')
             url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/find"
             ssl._create_default_https_context = ssl._create_unverified_context
-            os.environ['SSL_CERT_FILE'] = certifi.where()        
+            #os.environ['SSL_CERT_FILE'] = certifi.where()        
             req = urllib.request.Request(url,  data=params, headers=headers)
             response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
             return response 
@@ -118,7 +118,7 @@ class MainApp(MDApp) :
         params = json.dumps(json_data).encode('utf8')
         url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/findOne"
         ssl._create_default_https_context = ssl._create_unverified_context
-        os.environ['SSL_CERT_FILE'] = certifi.where()        
+        #os.environ['SSL_CERT_FILE'] = certifi.where()        
         req = urllib.request.Request(url,  data=params, headers=headers)
         response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
         return response   
@@ -139,7 +139,7 @@ class MainApp(MDApp) :
         params = json.dumps(json_data).encode('utf8')
         url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/insertOne"
         ssl._create_default_https_context = ssl._create_unverified_context
-        os.environ['SSL_CERT_FILE'] = certifi.where()        
+        #os.environ['SSL_CERT_FILE'] = certifi.where()        
         req = urllib.request.Request(url,  data=params, headers=headers)
         response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
         return response
@@ -276,7 +276,7 @@ class MainApp(MDApp) :
             conditionsSetURL = 'https://api.pawan.krd/v1/chat/completions'
             params = json.dumps(json_data).encode('utf8')
             ssl._create_default_https_context = ssl._create_unverified_context
-            os.environ['SSL_CERT_FILE'] = certifi.where()
+            #os.environ['SSL_CERT_FILE'] = certifi.where()
             req = urllib.request.Request(conditionsSetURL, data=params,headers=headers)
             response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
                        
