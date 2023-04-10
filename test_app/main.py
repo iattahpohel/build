@@ -70,15 +70,15 @@ class MainApp(MDApp) :
         screen_manager.current = "main"
     
     def check_internet():
-
+        """
         try:
             page = urllib.request.urlopen("https://www.google.com/")
         except urllib.error.URLError:
             toast ("Connection lost !!! Please check your internet !")
             return False
-        
+        """
         return True
-            
+           
     def get_his(query ,clt):
         
             headers = {
