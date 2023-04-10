@@ -28,7 +28,7 @@ class Time(MDLabel):
     halign = StringProperty()
     font_size = 10
         
-class MainApp(MDApp):
+class MainApp(MDApp) :
     current_id = ""
     
     def build(self):
@@ -63,26 +63,43 @@ class MainApp(MDApp):
             screen_manager.transition.direction = "right"
         screen_manager.current = "main"
     
+    def check_internet():
+        try:
+            page = urllib.request.urlopen("https://www.google.com/")
+        except urllib.error.HTTPError as err:
+            if err.code == 404:
+                toast ("Page not found!")
+            elif err.code == 403:
+                toast ("Access denied!")
+            else:
+                toast ("Something happened! Error code", err.code)
+            return False
+        except urllib.error.URLError:
+            toast ("Connection lost !!! Please check your internet !")
+            return False
+        return True
+            
     def get_his(query ,clt):
-        headers = {
-            'apiKey': '8jGGsNjg9uKrLqMNRaNB1f6oxooPJ0GHUuToGrlNBTTBQ3beOfPV7crKpRCfyNTM',
-            'Content-Type': 'application/json',
-        }
-
-        json_data = {
-            "dataSource": "Cluster0",
-            "database": "vafa",
-            "collection": clt,
-            "filter": query,
-            "sort": {"time": -1}  
-            }
         
-        params = json.dumps(json_data).encode('utf8')
-        url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/find"      
-                
-        req = urllib.request.Request(url,  data=params, headers=headers)
-        response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
-        return response 
+            headers = {
+                'apiKey': '8jGGsNjg9uKrLqMNRaNB1f6oxooPJ0GHUuToGrlNBTTBQ3beOfPV7crKpRCfyNTM',
+                'Content-Type': 'application/json',
+            }
+
+            json_data = {
+                "dataSource": "Cluster0",
+                "database": "vafa",
+                "collection": clt,
+                "filter": query,
+                "sort": {"time": -1}  
+                }
+            
+            params = json.dumps(json_data).encode('utf8')
+            url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/find"      
+                    
+            req = urllib.request.Request(url,  data=params, headers=headers)
+            response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
+            return response 
     
     def get_mongo(query ,clt):
         headers = {
@@ -125,7 +142,7 @@ class MainApp(MDApp):
         return response
     
     def signin(self, mail, passw, repassw):
-        if MainApp.connect_test(self):
+        if MainApp.check_internet():
             myquery = {"mail": mail}
             regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
             if re.fullmatch(regex, mail):
@@ -149,7 +166,7 @@ class MainApp(MDApp):
                 toast("Invalid email !!!")
             
     def check_login(self, mail, passw):
-        if MainApp.connect_test(self):
+        if MainApp.check_internet():
             regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
             if re.fullmatch(regex, mail):
                 if len(passw) < 8:
@@ -167,14 +184,6 @@ class MainApp(MDApp):
                         toast("Unregistered email !!!")
             else:
                 toast("Invalid email !!!")
-            
-    def connect_test(self):
-        try:
-            response=urllib.request.urlopen('https://www.google.com/',timeout=1)
-            return True
-        except urllib.error.URLError as err:
-            toast ("Can't connect to server! Please check your Internet!")
-            return False
             
     def message(self, text):
         toast(text)
@@ -230,17 +239,18 @@ class MainApp(MDApp):
         screen_manager.get_screen("hist").chat_list.add_widget(Time(text=text, size_hint_x=size, halign=halign))
             
     def load_his(self):
-        
-        myquery = {"id": MainApp.current_id}
-        data = MainApp.get_his(myquery, "history")["documents"]
-        for doc in data:
-            MainApp.time_his(doc["time"])
-            MainApp.us_ques("hist", doc["question"])
-            MainApp.as_res("hist", doc["response"])
+        if MainApp.check_internet():
+            myquery = {"id": MainApp.current_id}
+            data = MainApp.get_his(myquery, "history")["documents"]
+            for doc in data:
+                MainApp.time_his(doc["time"])
+                MainApp.us_ques("hist", doc["question"])
+                MainApp.as_res("hist", doc["response"])           
+        else:
+            MainApp.to_main(self)
             
-         
     def chat_bot(self, question):
-        if MainApp.connect_test(self):    
+        if MainApp.check_internet():   
             headers = {
             'Authorization': "Bearer pk-tvCyIlXThuxlWPDsqwOJYTxLSQevKkXCrEANoIongjRdXbWh",
             'Content-Type': 'application/json',
@@ -286,3 +296,4 @@ class MainApp(MDApp):
  
 if __name__ == "__main__":
     MainApp().run()
+        
