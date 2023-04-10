@@ -12,8 +12,9 @@ import json
 
 import certifi
 import os
+import ssl
 
-# Here's all the magic !
+ssl._create_default_https_context = ssl._create_unverified_context
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
 class Response(MDLabel):
