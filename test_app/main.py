@@ -10,6 +10,12 @@ import urllib
 import urllib.request
 import json
 
+import certifi
+import os
+
+# Here's all the magic !
+os.environ['SSL_CERT_FILE'] = certifi.where()
+
 class Response(MDLabel):
     text = StringProperty()
     size_hint_x = NumericProperty()
