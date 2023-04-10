@@ -1,5 +1,4 @@
 import re
-from pymongo import MongoClient 
 from time import localtime, strftime
 from kivymd.app import MDApp
 from kivymd.toast import toast
@@ -8,12 +7,8 @@ from kivymd.uix.label import MDLabel
 from kivy.uix.screenmanager import ScreenManager
 from kivy.properties import StringProperty, NumericProperty
 import urllib
+import urllib.request
 import json
-
-myclient = MongoClient("mongodb+srv://atta:190501@cluster0.zdkcp1y.mongodb.net/test")
-mydb = myclient["vafa"]
-myuser = mydb["user"]
-myhis = mydb["history"]
 
 class Response(MDLabel):
     text = StringProperty()
@@ -67,7 +62,68 @@ class MainApp(MDApp):
         else:
             screen_manager.transition.direction = "right"
         screen_manager.current = "main"
+    
+    def get_his(query ,clt):
+        headers = {
+            'apiKey': '8jGGsNjg9uKrLqMNRaNB1f6oxooPJ0GHUuToGrlNBTTBQ3beOfPV7crKpRCfyNTM',
+            'Content-Type': 'application/json',
+        }
+
+        json_data = {
+            "dataSource": "Cluster0",
+            "database": "vafa",
+            "collection": clt,
+            "filter": query,
+            "sort": {"time": -1}  
+            }
         
+        params = json.dumps(json_data).encode('utf8')
+        url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/find"      
+                
+        req = urllib.request.Request(url,  data=params, headers=headers)
+        response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
+        return response 
+    
+    def get_mongo(query ,clt):
+        headers = {
+            'apiKey': '8jGGsNjg9uKrLqMNRaNB1f6oxooPJ0GHUuToGrlNBTTBQ3beOfPV7crKpRCfyNTM',
+            'Content-Type': 'application/json',
+        }
+
+        json_data = {
+            "dataSource": "Cluster0",
+            "database": "vafa",
+            "collection": clt,
+            "filter": query  
+            }
+        
+        params = json.dumps(json_data).encode('utf8')
+        url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/findOne"      
+                
+        req = urllib.request.Request(url,  data=params, headers=headers)
+        response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
+        return response   
+        
+    def send_mongo(data, clt):
+        headers = {
+            'apiKey': '8jGGsNjg9uKrLqMNRaNB1f6oxooPJ0GHUuToGrlNBTTBQ3beOfPV7crKpRCfyNTM',
+            'Content-Type': 'application/json',
+        }
+
+        json_data = {
+            "dataSource": "Cluster0",
+            "database": "vafa",
+            "collection": clt,
+            "document": data   
+            }
+        
+        params = json.dumps(json_data).encode('utf8')
+        url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/insertOne"      
+                
+        req = urllib.request.Request(url,  data=params, headers=headers)
+        response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
+        return response
+    
     def signin(self, mail, passw, repassw):
         if MainApp.connect_test(self):
             myquery = {"mail": mail}
@@ -79,14 +135,14 @@ class MainApp(MDApp):
                     if repassw != passw:
                         toast("Different re-enter password !!!")
                     else:
-                        if myuser.count_documents(myquery):
+                        if MainApp.get_mongo(myquery, "user")["document"] != None :
                             toast("This email is already registered !!!")
                         else:
                             user = {
                                 "mail": mail,
                                 "password": passw,
                             }
-                            myuser.insert_one(user)
+                            MainApp.send_mongo(user, "user")
                             toast("Sign Up Success !!!")
                             MainApp.to_login(self)
             else:
@@ -100,10 +156,10 @@ class MainApp(MDApp):
                     toast("Password length must be greater than 8 !!!")
                 else:
                     myquery = {"mail": mail}
-                    if myuser.count_documents(myquery):
-                        user = myuser.find(myquery)[0]
-                        if passw == user["password"]:
-                            MainApp.current_id = user["_id"]
+                    get_mail = MainApp.get_mongo(myquery, "user")["document"]
+                    if get_mail != None:
+                        if passw == get_mail["password"]:
+                            MainApp.current_id = get_mail["_id"]
                             MainApp.to_main(self)
                         else:    
                             toast("Incorrect Password !!!")
@@ -176,7 +232,7 @@ class MainApp(MDApp):
     def load_his(self):
         
         myquery = {"id": MainApp.current_id}
-        data = myhis.find(myquery)
+        data = MainApp.get_his(myquery, "history")["documents"]
         for doc in data:
             MainApp.time_his(doc["time"])
             MainApp.us_ques("hist", doc["question"])
@@ -224,7 +280,7 @@ class MainApp(MDApp):
                     "response": data["content"],
                     "time": now,
                 }
-                myhis.insert_one(history)
+                MainApp.send_mongo(history, "history")
             except:
                 MainApp.as_res("main", "I do not understand what you say! Can you be more specific again?")
  
