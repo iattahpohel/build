@@ -16,19 +16,19 @@ class Response(MDLabel):
     text = StringProperty()
     size_hint_x = NumericProperty()
     halign = StringProperty()
-    font_size = 13
+    font_size = 20
         
 class Command(MDLabel):
     text = StringProperty()
     size_hint_x = NumericProperty()
     halign = StringProperty()
-    font_size = 13
+    font_size = 20
 
 class Time(MDLabel):
     text = StringProperty()
     size_hint_x = NumericProperty()
     halign = StringProperty()
-    font_size = 10
+    font_size = 15
         
 class MainApp(MDApp) :
     current_id = ""
@@ -68,13 +68,13 @@ class MainApp(MDApp) :
         screen_manager.current = "main"
     
     def check_internet():
-        """
+     
         try:
             page = urllib.request.urlopen("https://www.google.com/")
         except urllib.error.URLError:
             toast ("Connection lost !!! Please check your internet !")
             return False
-        """
+        
         return True
            
     def get_his(query ,clt):
@@ -256,18 +256,17 @@ class MainApp(MDApp) :
     def chat_bot(self, question):
         if MainApp.check_internet():   
             headers = {
-            'Authorization': "Bearer pk-tvCyIlXThuxlWPDsqwOJYTxLSQevKkXCrEANoIongjRdXbWh",
+            'Authorization': 'Bearer pk-tvCyIlXThuxlWPDsqwOJYTxLSQevKkXCrEANoIongjRdXbWh',
             'Content-Type': 'application/json',
             }
 
             json_data = {
-                'model': 'gpt-3.5-turbo',
-                'max_tokens': 4000,
-                'stop': 'None',
-                'messages': [
+                "model": "gpt-3.5-turbo",
+                "max_tokens": 4000,
+                "messages": [
                     {
-                        'role': 'user',
-                        'content': question,
+                        "role": "user",
+                        "content": question,
                     },
                 ],
             }
@@ -297,4 +296,3 @@ class MainApp(MDApp) :
  
 if __name__ == "__main__":
     MainApp().run()
-        
