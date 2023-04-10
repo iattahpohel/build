@@ -64,19 +64,13 @@ class MainApp(MDApp) :
         screen_manager.current = "main"
     
     def check_internet():
+        """
         try:
             page = urllib.request.urlopen("https://www.google.com/")
-        except urllib.error.HTTPError as err:
-            if err.code == 404:
-                toast ("Page not found!")
-            elif err.code == 403:
-                toast ("Access denied!")
-            else:
-                toast ("Something happened! Error code", err.code)
-            return False
         except urllib.error.URLError:
             toast ("Connection lost !!! Please check your internet !")
             return False
+        """
         return True
             
     def get_his(query ,clt):
