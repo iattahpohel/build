@@ -139,6 +139,12 @@ class MainApp(MDApp) :
         response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
         return response
     
+    def send_AI(params, headers):
+        url = "https://api.pawan.krd/v1/chat/completions"              
+        req = urllib.request.Request(url,  data=params, headers=headers)
+        response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
+        return response
+    
     def signin(self, mail, passw, repassw):
         if MainApp.check_internet():
             myquery = {"mail": mail}
@@ -266,13 +272,9 @@ class MainApp(MDApp) :
                 ],
             }
             MainApp.us_ques("main", question)
-            
-            #get response from AI
-            conditionsSetURL = 'https://api.pawan.krd/v1/chat/completions'
-            params = json.dumps(json_data).encode('utf8')
-            
-            req = urllib.request.Request(conditionsSetURL, data=params,headers=headers)
-            response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
+              
+            params = json.dumps(json_data).encode('utf8')            
+            response = MainApp.send_AI(params, headers)
                        
             try:
                 data = response["choices"][0]["message"]
