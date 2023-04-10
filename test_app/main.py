@@ -1,5 +1,5 @@
 import re
-import pymongo
+from pymongo import MongoClient 
 from time import localtime, strftime
 from kivymd.app import MDApp
 from kivymd.toast import toast
@@ -10,7 +10,7 @@ from kivy.properties import StringProperty, NumericProperty
 import urllib
 import json
 
-myclient = pymongo.MongoClient("mongodb+srv://atta:190501@cluster0.zdkcp1y.mongodb.net/test")
+myclient = MongoClient("mongodb+srv://atta:190501@cluster0.zdkcp1y.mongodb.net/test")
 mydb = myclient["vafa"]
 myuser = mydb["user"]
 myhis = mydb["history"]
