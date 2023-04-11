@@ -16,20 +16,20 @@ class Response(MDLabel):
     text = StringProperty()
     size_hint_x = NumericProperty()
     halign = StringProperty()
-    font_size = 20
+    
         
 class Command(MDLabel):
     text = StringProperty()
     size_hint_x = NumericProperty()
     halign = StringProperty()
-    font_size = 20
+    
 
 class Time(MDLabel):
     text = StringProperty()
     size_hint_x = NumericProperty()
     halign = StringProperty()
-    font_size = 15
-        
+    font_size = 20
+            
 class MainApp(MDApp) :
     current_id = ""
     ssl._create_default_https_context = ssl._create_unverified_context
