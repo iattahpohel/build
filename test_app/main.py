@@ -9,43 +9,53 @@ from kivy.properties import StringProperty, NumericProperty
 import urllib
 import urllib.request
 import json
-
 import ssl
+from kivy.core.window import Window
+from kivy.uix.image import AsyncImage
 
 class Response(MDLabel):
     text = StringProperty()
     size_hint_x = NumericProperty()
-    halign = StringProperty()
-    
+    halign = StringProperty()    
         
 class Command(MDLabel):
     text = StringProperty()
     size_hint_x = NumericProperty()
-    halign = StringProperty()
-    
+    halign = StringProperty()   
 
 class Time(MDLabel):
     text = StringProperty()
     size_hint_x = NumericProperty()
     halign = StringProperty()
     font_size = 20
-            
+
+class Image(AsyncImage):
+    pass
+                
 class MainApp(MDApp) :
+    global screen_manager , pass_screen
     current_id = ""
-    ssl._create_default_https_context = ssl._create_unverified_context
-    
-    
+    current_type = ""
+    ssl._create_default_https_context = ssl._create_unverified_context  
+    Window.softinput_mode = "below_target"
+    screen_manager = ScreenManager()
+        
     def build(self):
-        global screen_manager
-        screen_manager = ScreenManager()
+        screen_manager.add_widget(Builder.load_file("main.kv"))
+        screen_manager.add_widget(Builder.load_file("image.kv"))
         screen_manager.add_widget(Builder.load_file("login.kv"))
         screen_manager.add_widget(Builder.load_file("signin.kv"))
-        screen_manager.add_widget(Builder.load_file("main.kv"))
         screen_manager.add_widget(Builder.load_file("history.kv"))
         return screen_manager
-    
+
+    def to_img(self):
+        screen_manager.transition.direction = "up"
+        screen_manager.current = "img"
+           
     def to_hist(self):
+        global pass_screen
         screen_manager.transition.direction = "left"
+        pass_screen = screen_manager.current
         screen_manager.current = "hist"
         
     def to_sign(self):
@@ -63,22 +73,25 @@ class MainApp(MDApp) :
     def to_main(self):
         if screen_manager.current == "login":
             screen_manager.transition.direction = "left"
+        elif screen_manager.current == "img":
+            screen_manager.transition.direction = "down"
         else:
             screen_manager.transition.direction = "right"
-        screen_manager.current = "main"
+        if screen_manager.current == "hist":
+            screen_manager.current = pass_screen
+        else:
+            screen_manager.current = "main"
+       
     
     def check_internet():
-     
         try:
             page = urllib.request.urlopen("https://www.google.com/")
         except urllib.error.URLError:
             toast ("Connection lost !!! Please check your internet !")
             return False
-        
         return True
            
-    def get_his(query ,clt):
-        
+    def get_his(query ,clt):        
             headers = {
                 'apiKey': '8jGGsNjg9uKrLqMNRaNB1f6oxooPJ0GHUuToGrlNBTTBQ3beOfPV7crKpRCfyNTM',
                 'Content-Type': 'application/json',
@@ -90,11 +103,10 @@ class MainApp(MDApp) :
                 "collection": clt,
                 "filter": query,
                 "sort": {"time": -1}  
-                }
+            }
             
             params = json.dumps(json_data).encode('utf8')
-            url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/find"
-                   
+            url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/find"                   
             req = urllib.request.Request(url,  data=params, headers=headers)
             response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
             return response 
@@ -110,7 +122,7 @@ class MainApp(MDApp) :
             "database": "vafa",
             "collection": clt,
             "filter": query  
-            }
+        }
         
         params = json.dumps(json_data).encode('utf8')
         url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/findOne"
@@ -130,17 +142,10 @@ class MainApp(MDApp) :
             "database": "vafa",
             "collection": clt,
             "document": data   
-            }
+        }
         
         params = json.dumps(json_data).encode('utf8')
-        url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/insertOne"
-                
-        req = urllib.request.Request(url,  data=params, headers=headers)
-        response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
-        return response
-    
-    def send_AI(params, headers):
-        url = "https://api.pawan.krd/v1/chat/completions"              
+        url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-sdgkt/endpoint/data/v1/action/insertOne"               
         req = urllib.request.Request(url,  data=params, headers=headers)
         response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
         return response
@@ -211,9 +216,12 @@ class MainApp(MDApp) :
             halign="center"
         else:
             size = .9
-            halign="justify"
-        screen_manager.get_screen(screen).chat_list.add_widget(Response(text=text, size_hint_x=size, halign=halign))              
-     
+            halign="justify" 
+        screen_manager.get_screen(screen).chat_list.add_widget(Response(text=text, size_hint_x=size, halign=halign))
+                      
+    def as_res_img(screen, text):
+        screen_manager.get_screen(screen).chat_list.add_widget(AsyncImage(source=text))
+         
     def us_ques(screen, text):
         if len(text) in range(0,11):
             size =.22
@@ -249,20 +257,72 @@ class MainApp(MDApp) :
             for doc in data:
                 MainApp.time_his(doc["time"])
                 MainApp.us_ques("hist", doc["question"])
-                MainApp.as_res("hist", doc["response"])           
+                if doc["type"] == "text":
+                    MainApp.as_res("hist", doc["response"])           
+                else:
+                    MainApp.as_res_img("hist", doc["response"])
         else:
             MainApp.to_main(self)
             
+    def send_AI(params, headers):
+        url = "https://api.pawan.krd/v1/chat/completions"              
+        req = urllib.request.Request(url,  data=params, headers=headers)
+        response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
+        return response
+    
+    def send_IMG(params, headers):    
+        url =  "https://api.pawan.krd/v1/images/generations"
+        req = urllib.request.Request(url,  data=params, headers=headers)
+        response = json.loads(urllib.request.urlopen(req).read().decode('utf8'))
+        return response
+    
+    def img_bot(self, question):
+        if MainApp.check_internet():   
+            headers = {
+            'Authorization': 'Bearer pk-tvCyIlXThuxlWPDsqwOJYTxLSQevKkXCrEANoIongjRdXbWh',
+            'Content-Type': 'application/json',
+            }
+            
+            json_data = {
+                "n": 1,
+                "prompt":question,
+                "size":"1024x1024"
+            }
+            MainApp.us_ques("img", question)
+              
+            params = json.dumps(json_data).encode('utf8')            
+            response = MainApp.send_IMG(params, headers)
+            print(response)          
+            try:
+                data = response["data"][0]["url"]
+                if data == "":
+                    MainApp.as_res("img", "I do not understand what you say! Can you be more specific again?")
+                else:    
+                    MainApp.as_res_img("img", data)
+                
+                    #push data to DB
+                    now = strftime("%H:%M:%S   %d/%m/%Y", localtime())
+                    history = {
+                        "id": MainApp.current_id,
+                        "type": "img",
+                        "question": question,
+                        "response": data,
+                        "time": now,
+                    }
+                    MainApp.send_mongo(history, "history")
+            except:
+                MainApp.as_res("img", "I do not understand what you say! Can you be more specific again?")
+    
     def chat_bot(self, question):
         if MainApp.check_internet():   
             headers = {
             'Authorization': 'Bearer pk-tvCyIlXThuxlWPDsqwOJYTxLSQevKkXCrEANoIongjRdXbWh',
             'Content-Type': 'application/json',
             }
-
+            
             json_data = {
                 "model": "gpt-3.5-turbo",
-                "max_tokens": 4000,
+                "max_tokens": 3800,
                 "messages": [
                     {
                         "role": "user",
@@ -282,15 +342,16 @@ class MainApp(MDApp) :
                 else:    
                     MainApp.as_res("main", data["content"])
                 
-                #push data to DB
-                now = strftime("%H:%M:%S   %d/%m/%Y", localtime())
-                history = {
-                    "id": MainApp.current_id,
-                    "question": question,
-                    "response": data["content"],
-                    "time": now,
-                }
-                MainApp.send_mongo(history, "history")
+                    #push data to DB
+                    now = strftime("%H:%M:%S   %d/%m/%Y", localtime())
+                    history = {
+                        "id": MainApp.current_id,
+                        "type": "text",
+                        "question": question,
+                        "response": data["content"],
+                        "time": now,
+                    }
+                    MainApp.send_mongo(history, "history")
             except:
                 MainApp.as_res("main", "I do not understand what you say! Can you be more specific again?")
  

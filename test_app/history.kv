@@ -7,8 +7,8 @@
     text_color: 1,1,1,1
     canvas.before:
         Color:
-            rgb: app.theme_cls.primary_color
-            #rgb: (1, 170/255, 23/255,1)
+            #rgb: app.theme_cls.primary_color
+            rgb: (1, 170/255, 23/255,1)
         RoundedRectangle:
             size: self.width, self.height
             pos: self.pos
@@ -30,6 +30,12 @@
         Color:
             rgb: (1,1,1,1)
 
+<Image>
+    size_hint_y: None
+    pos_hint: {"x": 0}
+    height: 300
+    paddding: 15, 20
+
 MDScreen:   
     name: "hist"
     chat_list: chat_list
@@ -43,8 +49,8 @@ MDScreen:
             halign: "center"
         ScrollView:
             id: scroll
-            size_hint_y: .9
-            pos_hint: {"x": 0, "y": .025}
+            size_hint_y: .85
+            pos_hint: {"x": 0, "y": .03}
             do_sroll_x: False
             do_sroll_y: True
             MDBoxLayout:

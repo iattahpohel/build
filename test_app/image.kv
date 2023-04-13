@@ -12,20 +12,14 @@
         RoundedRectangle:
             size: self.width, self.height
             pos: self.pos
-<Response>
+<Image>
     size_hint_y: None
-    pos_hint: {"x": .02}
-    height: self.texture_size[1]
+    pos_hint: {"right": .02}
+    height: 300
     paddding: 15, 20
-    canvas.before:
-        Color:
-            rgb: (222/255,222/255,222/255,1)
-        RoundedRectangle:
-            size: self.width, self.height
-            pos: self.pos
     
 MDScreen:   
-    name: "main"
+    name: "img"
     chat_list: chat_list
     text_input: question.text
     scroll: scroll
@@ -33,6 +27,8 @@ MDScreen:
         question.text = ""
 
     MDFloatLayout:
+
+        
 
         ScrollView:
             id: scroll
@@ -63,7 +59,7 @@ MDScreen:
                 text: "Send"
                 pos_hint: {"center_x": .88, "center_y": .34}
                 on_release:
-                    app.chat_bot(question.text) if question.text != "" else app.message("Please do not leave the field blank !!!")
+                    app.img_bot(question.text) if question.text != "" else app.message("Please do not leave the field blank !!!")
                     question.text = ""
 
     MDRectangleFlatButton:
@@ -80,7 +76,7 @@ MDScreen:
             app.to_hist()
 
     MDRectangleFlatButton:
-        text: "Image"
-        pos_hint:{"right": .55,"top": .98}
+        text: "Text"
+        pos_hint:{"right": .55, "top": .98}
         on_release:
-            app.to_img()
+            app.to_main()
