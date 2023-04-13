@@ -12,10 +12,10 @@
         RoundedRectangle:
             size: self.width, self.height
             pos: self.pos
-<Image>
+<MyImage>
     size_hint_y: None
-    pos_hint: {"right": .02}
-    height: 300
+    pos_hint: {"center_x": .05}
+    height: 600
     paddding: 15, 20
     
 MDScreen:   
@@ -77,6 +77,6 @@ MDScreen:
 
     MDRectangleFlatButton:
         text: "Text"
-        pos_hint:{"right": .55, "top": .98}
+        pos_hint:{"right": .6, "top": .98}
         on_release:
             app.to_main()

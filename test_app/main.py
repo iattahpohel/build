@@ -29,7 +29,7 @@ class Time(MDLabel):
     halign = StringProperty()
     font_size = 20
 
-class Image(AsyncImage):
+class MyImage(AsyncImage):
     pass
                 
 class MainApp(MDApp) :
@@ -41,9 +41,9 @@ class MainApp(MDApp) :
     screen_manager = ScreenManager()
         
     def build(self):
+        screen_manager.add_widget(Builder.load_file("login.kv"))
         screen_manager.add_widget(Builder.load_file("main.kv"))
         screen_manager.add_widget(Builder.load_file("image.kv"))
-        screen_manager.add_widget(Builder.load_file("login.kv"))
         screen_manager.add_widget(Builder.load_file("signin.kv"))
         screen_manager.add_widget(Builder.load_file("history.kv"))
         return screen_manager
@@ -220,7 +220,7 @@ class MainApp(MDApp) :
         screen_manager.get_screen(screen).chat_list.add_widget(Response(text=text, size_hint_x=size, halign=halign))
                       
     def as_res_img(screen, text):
-        screen_manager.get_screen(screen).chat_list.add_widget(AsyncImage(source=text))
+        screen_manager.get_screen(screen).chat_list.add_widget(MyImage(source=text))
          
     def us_ques(screen, text):
         if len(text) in range(0,11):
