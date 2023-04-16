@@ -102,7 +102,7 @@ class MainApp(MDApp) :
                 "database": "vafa",
                 "collection": clt,
                 "filter": query,
-                "sort": {"time": - 1, "date": -1}  
+                "sort": { "date": -1, "time": - 1}  
             }
             
             params = json.dumps(json_data).encode('utf8')
