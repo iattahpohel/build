@@ -102,7 +102,7 @@ class MainApp(MDApp) :
                 "database": "vafa",
                 "collection": clt,
                 "filter": query,
-                "sort": {"time": -1}  
+                "sort": {"time": - 1, "date": -1}  
             }
             
             params = json.dumps(json_data).encode('utf8')
@@ -255,7 +255,8 @@ class MainApp(MDApp) :
             myquery = {"id": MainApp.current_id}
             data = MainApp.get_his(myquery, "history")["documents"]
             for doc in data:
-                MainApp.time_his(doc["time"])
+                time = doc["time"] +  " " + doc["date"]
+                MainApp.time_his(time)
                 MainApp.us_ques("hist", doc["question"])
                 if doc["type"] == "text":
                     MainApp.as_res("hist", doc["response"])           
@@ -301,13 +302,15 @@ class MainApp(MDApp) :
                     MainApp.as_res_img("img", data)
                 
                     #push data to DB
-                    now = strftime("%H:%M:%S   %d/%m/%Y", localtime())
+                    time = strftime("%H:%M:%S", localtime())
+                    now = strftime("%d/%m/%Y", localtime())
                     history = {
                         "id": MainApp.current_id,
                         "type": "img",
                         "question": question,
                         "response": data,
-                        "time": now,
+                        "time": time,
+                        "date": now
                     }
                     MainApp.send_mongo(history, "history")
             except:
@@ -343,13 +346,15 @@ class MainApp(MDApp) :
                     MainApp.as_res("main", data["content"])
                 
                     #push data to DB
-                    now = strftime("%H:%M:%S   %d/%m/%Y", localtime())
+                    time = strftime("%H:%M:%S", localtime())
+                    now = strftime("%d/%m/%Y", localtime())
                     history = {
                         "id": MainApp.current_id,
                         "type": "text",
                         "question": question,
                         "response": data["content"],
-                        "time": now,
+                        "time": time,
+                        "date": now
                     }
                     MainApp.send_mongo(history, "history")
             except:
