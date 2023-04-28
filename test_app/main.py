@@ -285,37 +285,39 @@ class MainApp(MDApp) :
             }
             
             json_data = {
-                "n": 1,
                 "prompt":question,
+                "n": 1,
                 "size":"1024x1024"
             }
-            MainApp.us_ques("img", question)
-              
-            params = json.dumps(json_data).encode('utf8')            
-            response = MainApp.send_IMG(params, headers)
-            print(response)          
+                     
             try:
-                data = response["data"][0]["url"]
-                if data == "":
+                response = MainApp.send_IMG(params, headers)
+                MainApp.us_ques("img", question) 
+                params = json.dumps(json_data).encode('utf8')          
+                try:
+                    data = response["data"][0]["url"]
+                    if data == "":
+                        MainApp.as_res("img", "I do not understand what you say! Can you be more specific again?")
+                    else:    
+                        MainApp.as_res_img("img", data)
+                    
+                        #push data to DB
+                        time = strftime("%H:%M:%S", localtime())
+                        now = strftime("%d/%m/%Y", localtime())
+                        history = {
+                            "id": MainApp.current_id,
+                            "type": "img",
+                            "question": question,
+                            "response": data,
+                            "time": time,
+                            "date": now
+                        }
+                        MainApp.send_mongo(history, "history")
+                except:
                     MainApp.as_res("img", "I do not understand what you say! Can you be more specific again?")
-                else:    
-                    MainApp.as_res_img("img", data)
-                
-                    #push data to DB
-                    time = strftime("%H:%M:%S", localtime())
-                    now = strftime("%d/%m/%Y", localtime())
-                    history = {
-                        "id": MainApp.current_id,
-                        "type": "img",
-                        "question": question,
-                        "response": data,
-                        "time": time,
-                        "date": now
-                    }
-                    MainApp.send_mongo(history, "history")
             except:
-                MainApp.as_res("img", "I do not understand what you say! Can you be more specific again?")
-    
+                toast("This services is temporarily down please use text completion services instead")
+
     def chat_bot(self, question):
         if MainApp.check_internet():   
             headers = {

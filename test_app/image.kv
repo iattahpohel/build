@@ -14,7 +14,7 @@
             pos: self.pos
 <MyImage>
     size_hint_y: None
-    pos_hint: {"center_x": .4}
+    pos_hint: {"center_x": .35}
     height: 600
     paddding: 15, 20
     
@@ -67,7 +67,7 @@ MDScreen:
         pos_hint:{"right":0.25,"top": .98}
         on_release:
             app.to_login()
-            app.clear("main")
+            app.clear("img")
     
     MDRectangleFlatButton:
         text: "History"
